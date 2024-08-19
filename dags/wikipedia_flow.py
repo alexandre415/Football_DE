@@ -7,7 +7,7 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pipelines.wikipedia_pipeline import extract_wikipedia_data, transform_wikipedia_data
+from pipelines.wikipedia_pipeline import extract_wikipedia_data, transform_wikipedia_data, write_wikipedia_data
 
 dag = DAG(
     dag_id='wikipedia_flow',
@@ -34,7 +34,6 @@ extract_data_from_wikipedia = PythonOperator(
 
   )
 
-extract_data_from_wikipedia
 # Preprocession
 transform_wikidepia_data = PythonOperator(
     task_id='transform_wikidepia_data',
@@ -43,5 +42,13 @@ transform_wikidepia_data = PythonOperator(
     dag=dag
 
 )
+extract_data_from_wikipedia
 # Write
+write_wikipedia_data = PythonOperator(
+    task_id='write_wikipedia_data',
+    provide_context=True,
+    python_callable=write_wikipedia_data,
+    dag=dag
 
+)
+extract_data_from_wikipedia >> transform_wikidepia_data >> write_wikipedia_data
